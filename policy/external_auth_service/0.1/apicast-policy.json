@@ -1,0 +1,280 @@
+{
+  "$schema": "http://apicast.io/policy-v1.1/schema#manifest#",
+  "name": "External Service Authorization",
+  "summary": "Validates the request against an external service",
+  "description": [
+    "Validates the request against an external service."
+  ],
+  "version": "0.1",
+  "configuration": {
+    "type": "object",
+    "properties": {
+      "validation_service_configuration":
+      {
+        "type":"object",
+        "description":"client configuration for validation service call",
+        "properties":
+        {
+          "validation_service_url": {
+            "description": "url for remote validation service",
+            "type": "string"
+          },
+          "validation_service_method": {
+            "description": "http method for invoking for remote validation service ",
+            "type": "string",
+            "default": "POST",
+            "enum": [
+              "GET",
+              "POST"
+            ]
+          },
+          "allowed_status_codes":
+          {
+            "description":"status codes to be returned to the client, if empty return every response as-is, if specified every non-matching code is translated into a 500, a HTTP 200 always returns OK",
+            "type": "array",
+            "items":
+            {
+              "type":"integer"
+            }
+          },
+          "validation_service_params": {
+            "description": "parameters for remote validation service",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "param": {
+                  "description": "Name of the parameter to be added",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Value that will be set in the parameter.",
+                  "type": "string"
+                },
+                "value_type": {
+                  "description": "How to evaluate 'value'",
+                  "type": "string",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "plain"
+                      ],
+                      "title": "Evaluate 'value' as plain text."
+                    },
+                    {
+                      "enum": [
+                        "liquid"
+                      ],
+                      "title": "Evaluate 'value' as liquid."
+                    }
+                  ],
+                  "default": "plain"
+                }
+              },
+              "required": [
+                "param"
+              ]
+            }
+          },
+          "validation_service_timeouts": {
+            "description": "timeout for validation service call",
+            "type": "object",
+            "properties": {
+              "connect_timeout": {
+                "type": "integer",
+                "description": "timeout for validation service connection",
+                "minimum": -1,
+                "maximum": 3600,
+                "default": 500
+              },
+              "request_timeout": {
+                "type": "integer",
+                "description": "timeout for validation service request",
+                "minimum": -1,
+                "maximum": 3600,
+                "default": 500
+              },
+              "response_timeout": {
+                "type": "integer",
+                "description": "timeout for validation service response",
+                "minimum": -1,
+                "maximum": 3600,
+                "default": 500
+              }
+            }
+          }
+        },
+        "required": [
+          "validation_service_url"
+        ]
+      },
+      "headers_configuration":
+      {
+        "type":"object",
+        "description":"headers to be passed to validation service",
+        "properties":
+        {
+          "headers_to_copy": {
+            "description": "headers to be copied to the remote service",
+            "type": "string",
+            "enum": [
+              "ALL",
+              "Selected Headers",
+              "None"
+            ],
+            "default": "ALL"
+          },
+          "additional_headers": {
+            "description": "headers to be added to the remote service call, if specified will override the copied ones",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "header": {
+                  "description": "Header to be added",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Value that will be set in the header.",
+                  "type": "string"
+                },
+                "value_type": {
+                  "description": "How to evaluate 'value'",
+                  "type": "string",
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "plain"
+                      ],
+                      "title": "Evaluate 'value' as plain text."
+                    },
+                    {
+                      "enum": [
+                        "liquid"
+                      ],
+                      "title": "Evaluate 'value' as liquid."
+                    }
+                  ],
+                  "default": "plain"
+                }
+              },
+              "required": [
+                "header"
+              ]
+            }
+          }
+        },
+        "dependencies": {
+          "headers_to_copy": {
+            "oneOf": [
+              {
+                "properties": {
+                  "headers_to_copy": {
+                    "describe": "Send ALL the received headers to the authorization service.",
+                    "enum": [
+                      "ALL"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "headers_to_copy": {
+                    "describe": "Don't send the received headers to the authorization service.",
+                    "enum": [
+                      "None"
+                    ]
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "headers_to_copy": {
+                    "describe": "Send ONLY SELECTED headers to the authorization service.",
+                    "enum": [
+                      "Selected Headers"
+                    ]
+                  },
+                  "selected_headers": {
+                    "type": "array",
+                    "description": "list of the headers to be copied",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "header_name": {
+                          "description": "Header to be copied",
+                          "type": "string"
+                        },
+                        "action_if_missing": {
+                          "description": "The action to be performed if the given header is missing",
+                          "type": "string",
+                          "default": "Ignore",
+                          "enum": [
+                            "Ignore",
+                            "Set Empty",
+                            "Fail"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "action_if_missing",
+                        "header_name"
+                      ],
+                      "dependencies": {
+                        "action_if_missing": {
+                          "oneOf": [
+                            {
+                              "properties": {
+                                "action_if_missing": {
+                                  "describe": "If the header is missing, ignore it",
+                                  "enum": [
+                                    "Ignore"
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "properties": {
+                                "action_if_missing": {
+                                  "describe": "If the header is missing, set it empty",
+                                  "enum": [
+                                    "Set Empty"
+                                  ]
+                                }
+                              }
+                            },
+                            {
+                              "properties": {
+                                "action_if_missing": {
+                                  "describe": "If the header is missing, fails",
+                                  "enum": [
+                                    "Fail"
+                                  ]
+                                },
+                                "http_status": {
+                                  "default": "401",
+                                  "type": "string"
+                                },
+                                "message": {
+                                  "description": "Message to be returned to the client",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "http_status"
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
