@@ -87,16 +87,16 @@
                 "maximum": 3600,
                 "default": 500
               },
-              "request_timeout": {
+              "send_timeout": {
                 "type": "integer",
-                "description": "timeout for validation service request",
+                "description": "timeout for sending service request",
                 "minimum": -1,
                 "maximum": 3600,
                 "default": 500
               },
-              "response_timeout": {
+              "read_timeout": {
                 "type": "integer",
-                "description": "timeout for validation service response",
+                "description": "timeout for reading service response",
                 "minimum": -1,
                 "maximum": 3600,
                 "default": 500

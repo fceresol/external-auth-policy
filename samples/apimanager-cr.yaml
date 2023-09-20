@@ -1,0 +1,42 @@
+apiVersion: apps.3scale.net/v1alpha1
+kind: APIManager
+metadata:
+  annotations:
+    apps.3scale.net/apimanager-threescale-version: "2.13"
+    apps.3scale.net/threescale-operator-version: 0.10.1
+  name: apimanager-test
+  namespace: 3scale
+spec:
+  apicast:
+    managementAPI: status
+    openSSLVerify: false
+    registryURL: http://apicast-staging:8090/policies
+    responseCodes: true
+    stagingSpec:
+      customPolicies:
+      - name: external_auth_service
+        secretRef:
+          name: external-auth-policy
+        version: "0.1"
+    productionSpec:
+      customPolicies:
+      - name: external_auth_service
+        secretRef:
+          name: external-auth-policy
+        version: "0.1"
+  appLabel: 3scale-api-management
+  backend:
+    cronSpec: {}
+    listenerSpec: {}
+    workerSpec: {}
+  imageStreamTagImportInsecure: false
+  resourceRequirementsEnabled: true
+  system:
+    appSpec: {}
+    sidekiqSpec: {}
+    sphinxSpec: {}
+  tenantName: 3scale
+  wildcardDomain: apps-crc.testing
+  zync:
+    appSpec: {}
+    queSpec: {}

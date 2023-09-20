@@ -1,0 +1,57 @@
+{
+    "name": "external_auth_service",
+    "version": "0.1",
+    "configuration": {
+        "validation_service_configuration": {
+            "validation_service_method": "POST",
+            "validation_service_timeouts": {
+                "request_timeout": 500,
+                "connect_timeout": 500,
+                "response_timeout": 500
+            },
+            "validation_service_url": "http://my-auth-service.auth-app.svc.cluster.local/auth",
+            "validation_service_params": [
+                {
+                    "value_type": "liquid",
+                    "param": "uri",
+                    "value": "{{ uri }}"
+                }
+            ],
+            "allowed_status_codes": [
+                401,
+                403
+            ]
+        },
+        "headers_configuration": {
+            "headers_to_copy": "Selected Headers",
+            "additional_headers": [
+                {
+                    "value_type": "plain",
+                    "header": "Accept",
+                    "value": "application/custom.authorization.v1+json"
+                },
+                {
+                    "value_type": "plain",
+                    "value": "application/json",
+                    "header": "Content-Type"
+                }
+            ],
+            "selected_headers": [
+                {
+                    "action_if_missing": "Ignore",
+                    "header_name": "X-customHeader-01"
+                },
+                {
+                    "action_if_missing": "Fail",
+                    "header_name": "X-customHeader-02",
+                    "http_status": "401",
+                    "message": "missing X-customHeader-02 header"
+                },
+                {
+                    "action_if_missing": "Set Empty",
+                    "header_name": "X-customHeader-03",
+                }
+            ]
+        }
+    }
+}
