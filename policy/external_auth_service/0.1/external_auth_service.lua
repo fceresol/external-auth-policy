@@ -49,7 +49,19 @@ local function has_value (tab, val)
     return false
 end
 
+local char_to_hex = function(c)
+  return string.format("%%%02X", string.byte(c))
+end
 
+local function urlencode(url)
+  if url == nil then
+    return ""
+  end
+  url = url:gsub("\n", "\r\n")
+  url = url:gsub("([^%w ])", char_to_hex)
+  url = url:gsub(" ", "+")
+  return url
+end
 
 --- if APICAST_LOG_LEVEL is set to DEBUG prints the content of the given table
 ---@param node table @ the table to be printed
@@ -191,7 +203,12 @@ local function invokeService(serviceUrl, args, httpMethod, headers, timeouts)
         
         if args then
             -- creating the HTTP GET service uri appending the arguments
-            fullApiURL = serviceUrl .. "?" .. args .. ""
+            argstring=""
+            for k, v in pairs(args) do
+                argstring = argstring .. "&" .. k .. "=" .. urlencode(v)
+            end
+            argstring= string.sub(argstring, 2)
+            fullApiURL = serviceUrl .. "?" .. argstring .. ""
         else
             fullApiURL = serviceUrl
         end
