@@ -498,7 +498,7 @@ function _M:access(context)
 
     ngx.log(DEBUG, '- ExternalAuthServicePolicy : invoking service')
     response_status_code, response_error, response_body = invokeService(self.validation_service_url, service_args,
-        self.validation_service_method, headers, self.timeouts)
+        self.validation_service_method, service_headers, self.timeouts)
     ngx.log(DEBUG, '- ExternalAuthServicePolicy : invoked service response_status_code-> ', response_status_code)
     ngx.log(DEBUG, '- ExternalAuthServicePolicy : invoked service response_error-> ', response_error or '')
     ngx.log(DEBUG, '- ExternalAuthServicePolicy : invoked service response_body-> ', response_body or '')
