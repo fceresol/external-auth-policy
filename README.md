@@ -32,7 +32,7 @@ A validation service configuration section containing the following parameters:
            {
             "value_type": "liquid",
             "param": "uri",
-            "value": "{{ uri }}"
+            "value": "{{ original_request.uri }}"
            }
           ],
           "allowed_status_codes": [
@@ -60,7 +60,7 @@ for example in order to have a field named **uri** in the request payload contai
            {
             "value_type": "liquid",
             "param": "uri",
-            "value": "{{ uri }}"
+            "value": "{{ original_request.uri }}"
            }
           ]
           
