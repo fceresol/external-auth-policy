@@ -53,6 +53,8 @@ local char_to_hex = function(c)
   return string.format("%%%02X", string.byte(c))
 end
 
+--- function urlencode encodes a variable with url standards replacing non stadard chars with http compatibile
+
 local function urlencode(url)
   if url == nil then
     return ""
