@@ -422,16 +422,26 @@ local function build_request_headers(self, context, headers, additional_headers)
         fail = nil
     end
 
+    -- changed header names in lowercase in order to avoid overlaps (ngnix stores them lowercase)
     if (not fail) then
         -- adding the additional headers (if any)
         ngx.log(DEBUG, '- ExternalAuthServicePolicy : adding additional headers')
         for _, header in ipairs(additional_headers) do
-            output[header.header] = header.template_string:render(context)
-            ngx.log(DEBUG, '- ExternalAuthServicePolicy : added request header: ' .. header.header .. 'with value ' ..
-                output[header.header])
+            local header_name=string.lower(header.header)
+            output[header_name] = header.template_string:render(context)
+            ngx.log(DEBUG, '- ExternalAuthServicePolicy : added request header: ' .. header_name .. 'with value ' ..
+                output[header_name])
         end
     end
 
+        -- removing Content-Lenght header to avoid conflicts
+        if output ~= nil then
+            if output['content-length'] ~= nil then
+                ngx.log(INFO, '- ExternalAuthServicePolicy : removing Content-Lenght header in order to avoid conflicts')
+                output['content-length'] = nil
+            end
+        end
+    
     return fail, output
 
 end
