@@ -434,13 +434,16 @@ local function build_request_headers(self, context, headers, additional_headers)
         end
     end
 
-        -- removing Content-Lenght header to avoid conflicts
-        if output ~= nil then
-            if output['content-length'] ~= nil then
+    -- 2025-03-21 dealing with different cases headers
+    -- removing Content-Lenght header to avoid conflicts
+    if output ~= nil then
+        for h_name, h_vlaue in pairs(output) do
+            if string.lower(h_name) == "content-length" then
                 ngx.log(INFO, '- ExternalAuthServicePolicy : removing Content-Lenght header in order to avoid conflicts')
-                output['content-length'] = nil
+                output[h_name] = nil
             end
         end
+    end
     
     return fail, output
 
